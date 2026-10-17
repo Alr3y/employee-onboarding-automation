@@ -1,133 +1,73 @@
-Employee Onboarding Automation
-End-to-end employee onboarding automation built with n8n, ASP.NET Core Web API, SQL Server, and Gmail Integration. The workflow automates employee registration, validation, email notification, audit logging, and API orchestration through a secure and scalable process.
+# Employee Onboarding Automation
 
-Project Overview
-This project demonstrates how business processes can be automated by integrating workflow orchestration with backend services.
+This repository contains the n8n workflow for an employee onboarding automation scenario. The workflow is exported in the `n8n/Employee-Onboarding-Workflow.json` file and is designed to receive onboarding requests, validate email input, authenticate to the Employee API, create a new employee record, send a confirmation email, and log the result.
 
-When a new employee onboarding request is submitted, the workflow:
+## Overview
 
-Receives the request through a webhook.
-Validates incoming data.
-Authenticates with the Employee Management API.
-Creates a new employee record.
-Sends an onboarding confirmation email.
-Records audit information.
-Returns a success or failure response.
-The solution showcases real-world automation scenarios commonly found in HR, ERP, and enterprise systems.
+The automation follows this flow:
 
-Architecture
-                            +------------------+
-                            | Client / HR User |
-                            +---------+--------+
-                                      |
-                                      v
-                          +----------------------+
-                          |    n8n Workflow      |
-                          |  (Docker Container)  |
-                          +----------+-----------+
-                                     |
-                                     v
-                      +-----------------------------+
-                      | Input Validation & Rules    |
-                      +-------------+---------------+
-                                    |
-                                    v
-                      +-----------------------------+
-                      | ASP.NET Core Employee API   |
-                      | JWT Authentication          |
-                      +-------------+---------------+
-                                    |
-                     +--------------+--------------+
-                     |                             |
-                     v                             v
-          +--------------------+      +--------------------+
-          | SQL Server         |      | Gmail Integration  |
-          | Employee Database  |      | Email Notification |
-          +--------------------+      +--------------------+
-                     |
-                     v
-          +--------------------+
-          | Employee Audit Log |
-          +--------------------+
-                     |
-                     v
-          +--------------------+
-          | Webhook Response   |
-          +--------------------+
+1. A client or HR system sends a POST request to the n8n webhook.
+2. The workflow extracts employee fields such as first name, last name, email, phone, hire date, salary, department ID, and active status.
+3. The workflow validates the email address using a regex check.
+4. If valid, it logs in to the ASP.NET Core API using JWT authentication.
+5. It calls the employee creation endpoint with the validated payload.
+6. It sends an onboarding success email via Gmail.
+7. It records the employee ID, email, and status in the audit log.
+8. It responds to the original webhook call with a JSON success payload.
 
-Development Environment:
-- n8n running in Docker
-- API exposed externally using ngrok
-Workflow Process
-1. Receive Request
-The workflow starts when a webhook receives employee onboarding data.
+If the email is invalid, the workflow returns an error response without calling the API.
 
-2. Data Validation
-Business rules validate employee information such as:
+## Workflow File
 
-Email format
-Required fields
-Employee attributes
-3. Authentication
-The workflow authenticates against the Employee Management API using JWT.
+- `n8n/Employee-Onboarding-Workflow.json`
 
-4. Employee Creation
-Validated employee information is sent to the Employee API.
+This exported workflow includes the following core n8n nodes:
 
-5. Email Notification
-A confirmation email is automatically sent to the employee.
+- `Webhook`
+- `Edit Fields`
+- `Email Validation`
+- `If_Valid_Email`
+- `LoginRequest`
+- `InsertEmployeeReq`
+- `Send a message`
+- `IF_email_sent_success`
+- `Edit Fields Success`
+- `Edit Fields Error`
+- `Respond to Webhook`
+- `EmployeeAuditLog`
 
-6. Audit Logging
-The workflow stores onboarding activity logs for traceability.
+## Architecture
 
-7. Response
-The workflow returns a success or error response to the caller.
+The process is built around an n8n orchestration layer and an external ASP.NET Core backend API.
 
-Features
-Webhook-based processing
-Employee onboarding automation
-JWT authentication
-REST API integration
-Business rule validation
-Email validation
-Automated Gmail notifications
-Audit logging
-Error handling
-End-to-end workflow orchestration
-Technology Stack
-Workflow Automation
-n8n
-Backend
-ASP.NET Core
-C#
-Entity Framework Core
-JWT Authentication
-SQL Server
-Integration
-REST API
-Webhook
-Gmail
-Development Tools
-Docker
-Swagger/OpenAPI
-Postman
-ngrok
-Related API Repository
-This workflow integrates with the Employee Management API:
+```text
+Client / HR System
+        |
+        v
+n8n Webhook
+        |
+        +--> Validate email
+        |
+        +--> Login to ASP.NET API (JWT)
+        |
+        +--> Create employee via POST /api/employees
+        |
+        +--> Send Gmail confirmation email
+        |
+        +--> Save audit log entry
+        |
+        +--> Respond with JSON result
+```
 
-🔗 https://github.com/Alr3y/Employee-Management-Systems
+## Actual Workflow Logic
 
-Development Environment
-n8n
-The workflow is executed inside a Docker container.
+From the workflow definition, the endpoint behaves like this:
 
-API
-ASP.NET Core Web API runs locally and provides employee management endpoints.
+- Webhook method: `POST`
+- Webhook path: `Employee`
+- Request body example:
 
-External Access
-During development and testing, ngrok is used to expose local API endpoints to the internet, allowing n8n and external clients to access the API securely.
-
-Sample Request
+```json
 {
   "firstName": "Aldi",
   "lastName": "Renaldi",
@@ -138,7 +78,30 @@ Sample Request
   "departmentId": 2,
   "isActive": true
 }
-Sample Response
+```
+
+- Authentication request:
+  - `POST https://<ngrok-host>/api/Auth/login`
+  - Body:
+
+```json
+{
+  "username": "aldi",
+  "password": "admin"
+}
+```
+
+- Employee creation request:
+  - `POST https://<ngrok-host>/api/employees`
+  - Authorization header:
+
+```http
+Authorization: Bearer <token>
+```
+
+- Success response payload generated by the workflow includes:
+
+```json
 {
   "employeeId": 20,
   "firstName": "Aldi",
@@ -146,54 +109,41 @@ Sample Response
   "email": "arenaldi006@gmail.com",
   "status": "Success"
 }
-Business Value
-This automation reduces manual HR activities by:
+```
 
-Eliminating repetitive data entry
-Improving onboarding consistency
-Reducing processing time
-Providing audit transparency
-Automating employee communication
-Improving operational efficiency
-Screenshots
-Workflow Automation
-screenshots/workflow.png
+## Technology Stack
 
-API Integration
-screenshots/api-success.png
+- n8n workflow automation
+- ASP.NET Core Web API
+- JWT authentication
+- SQL Server / database-backed employee records
+- Gmail integration for onboarding emails
+- ngrok for exposing local API endpoints during development
+- Docker-based n8n deployment
 
-Email Notification
-screenshots/email-notification.png
+## Repository Structure
 
-Architecture Diagram
-screenshots/architecture.png
-
-Repository Structure
-employee-onboarding-automation
-│
+```text
+employee-onboarding-automation/
 ├── README.md
-│
-├── screenshots
-│   ├── architecture.png
-│   ├── workflow.png
-│   ├── api-success.png
-│   └── email-notification.png
-│
-└── n8n
-    └── employee-onboarding.json
-Key Learning Outcomes
-This project demonstrates practical experience in:
+├── n8n/
+│   └── Employee-Onboarding-Workflow.json
+├── docs/
+├── screenshots/
+└── ...
+```
 
-Workflow Automation
-API Integration
-Backend Development
-JWT Authentication
-Docker Deployment
-Webhook Processing
-Email Automation
-Process Orchestration
-Enterprise Integration Patterns
-Author
+## Notes
+
+This repository focuses on the workflow automation layer and the integration pattern between n8n and the backend API. It is intended to demonstrate how an HR onboarding process can be automated by combining webhooks, validation, API authentication, request orchestration, email notifications, and audit logging.
+
+## Related Repository
+
+The workflow integrates with the Employee Management API project:
+
+- https://github.com/Alr3y/Employee-Management-Systems
+
+## Author
+
 Aldi Renaldi
 
-.NET Developer | Integration & Workflow Automation Enthusiast | Automation Engineer
