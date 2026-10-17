@@ -1,0 +1,584 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "Employee",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1264,
+        -112
+      ],
+      "id": "d42e96a5-28ce-4739-aaa6-c1ef1394a556",
+      "name": "Webhook",
+      "webhookId": "c31f12b0-f65f-4b0e-89e6-c93df6085fd8"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a63af4ea-b734-43d3-963b-d2e6ef35bde3",
+              "name": "firstName",
+              "value": "={{ $json.body.firstName }}",
+              "type": "string"
+            },
+            {
+              "id": "53fab8a8-b2d3-47aa-bbc8-09eaa65b4188",
+              "name": "lastName",
+              "value": "={{ $json.body.lastName }}",
+              "type": "string"
+            },
+            {
+              "id": "aa04e81a-af5a-4303-bd98-ffb2b9cbf533",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "d75c9890-506f-46f0-8d5a-6a9b02024ff1",
+              "name": "phone",
+              "value": "={{ $json.body.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "2c480e8d-bceb-4da4-a019-beba883fc5c4",
+              "name": "hireDate",
+              "value": "={{ $json.body.hireDate }}",
+              "type": "string"
+            },
+            {
+              "id": "4b8d62dc-54fb-479a-b940-537fe75eb1b9",
+              "name": "salary",
+              "value": "={{ $json.body.salary }}",
+              "type": "number"
+            },
+            {
+              "id": "3db2c7a6-dcee-4692-9474-a19e93b6796c",
+              "name": "departmentId",
+              "value": "={{ $json.body.departmentId }}",
+              "type": "number"
+            },
+            {
+              "id": "69756101-b2d3-4c5e-aa15-88ec881b98d1",
+              "name": "isActive",
+              "value": "={{ $json.body.isActive }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1024,
+        -112
+      ],
+      "id": "61275235-a7fc-4178-b08e-684c365d73b2",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Employee Onboarding Successfully Completed",
+        "message": "=<h2>Employee Registration Successful</h2>\n\n<p>Hello {{$json.firstName}},</p>\n\n<p>\nYour employee onboarding process has been completed successfully.\nYour information has been registered in our Human Resource Management System.\n</p>\n\n<table border=\"1\" cellpadding=\"5\" cellspacing=\"0\">\n<tr>\n<td><b>Employee ID</b></td>\n<td>{{$json.id}}</td>\n</tr>\n<tr>\n<td><b>Name</b></td>\n<td>{{$json.firstName}} {{$json.lastName}}</td>\n</tr>\n<tr>\n<td><b>Email</b></td>\n<td>{{$json.email}}</td>\n</tr>\n<tr>\n<td><b>Department</b></td>\n<td>{{$json.departmentName}}</td>\n</tr>\n</table>\n\n<p>\nIf any information above is incorrect, please contact HR immediately.\n</p>\n\n<p>\nThank you,<br>\nHR Department\n</p>\n",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": []
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        -320
+      ],
+      "id": "0f58aa6a-487e-4dda-80e7-04d97a180fe2",
+      "name": "Send a message",
+      "webhookId": "7396ea86-29f7-4205-bdce-083b0c027b1d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PWmjjH4r5cvhn5rp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -128,
+        -176
+      ],
+      "id": "e282e155-21b7-40b3-8032-f069c088bab5",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a418d2cd-1d19-4b2d-8db3-3a4f433e17f8",
+              "name": "filename",
+              "value": "={{ $json.filename }}",
+              "type": "string"
+            },
+            {
+              "id": "7e9f36b6-4dea-4688-be83-79dd36880faf",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "b6ffcc57-01b0-462e-b511-0f7718006539",
+              "name": "status",
+              "value": "=error email not valid :  {{ $json.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -464,
+        -96
+      ],
+      "id": "1b55214a-09d0-44be-9618-f5822c49b23e",
+      "name": "Edit Fields Error",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a205cdcf-f5cb-434c-924b-55049f86b640",
+              "name": "employeeId",
+              "value": "={{$node[\"InsertEmployeeReq\"].json.id}}",
+              "type": "string"
+            },
+            {
+              "id": "120bd336-701e-469e-b8ae-81ed2841f712",
+              "name": "firstName",
+              "value": "={{$node[\"InsertEmployeeReq\"].json.firstName}}",
+              "type": "string"
+            },
+            {
+              "id": "0625cd31-32a2-4592-acd5-d8dc83ef40d0",
+              "name": "lastName",
+              "value": "={{$node[\"InsertEmployeeReq\"].json.lastName}}",
+              "type": "string"
+            },
+            {
+              "id": "236906fe-c7e1-406d-a75a-46bce69019de",
+              "name": "email",
+              "value": "={{$node[\"InsertEmployeeReq\"].json.email}}",
+              "type": "string"
+            },
+            {
+              "id": "5d2ecdd1-feff-4e54-b075-70926030a091",
+              "name": "status",
+              "value": "Success",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        -336
+      ],
+      "id": "d7a42e5c-6b6c-4acb-bf78-7876ec32b7a9",
+      "name": "Edit Fields Success"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code node\nconst email = $json.email;\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n\nif (!email || !emailRegex.test(email)) {\n  return [{ json: { ...$json, email_valid: false, email_error: \"Format email salah\" } }];\n}\n\n\nreturn [{ json: { ...$json, email_valid: true } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -848,
+        -112
+      ],
+      "id": "15ea9306-4223-4330-99a2-3b1209c86826",
+      "name": "Email Validation"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bcad4036-a9c7-45c3-84f4-d540053c169d",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -528,
+        -320
+      ],
+      "id": "a5fb0a0b-e909-41e5-b29c-5c9f0e6de607",
+      "name": "IF_email_sent_success"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bcad4036-a9c7-45c3-84f4-d540053c169d",
+              "leftValue": "={{ $json.email_valid }}",
+              "rightValue": "={{ $json.email }} matches regex ^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -688,
+        -112
+      ],
+      "id": "067c48f5-619a-41a7-b8ea-af094862ee6a",
+      "name": "If_Valid_Email"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://freckles-unviable-preacher.ngrok-free.dev/api/Auth/login",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"username\": \"aldi\",\n  \"password\": \"admin\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1008,
+        -320
+      ],
+      "id": "20fc6d3e-3c24-46ef-8fdd-ee1a96f408cd",
+      "name": "LoginRequest"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://freckles-unviable-preacher.ngrok-free.dev/api/employees",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$node[\"LoginRequest\"].json[\"token\"]}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "firstName",
+              "value": "={{$node[\"Edit Fields\"].json.firstName}}"
+            },
+            {
+              "name": "lastName",
+              "value": "={{$node[\"Edit Fields\"].json.lastName}}"
+            },
+            {
+              "name": "email",
+              "value": "={{$node[\"Edit Fields\"].json.email}}"
+            },
+            {
+              "name": "phone",
+              "value": "={{$node[\"Edit Fields\"].json.phone}}"
+            },
+            {
+              "name": "hireDate",
+              "value": "={{$node[\"Edit Fields\"].json.hireDate}}"
+            },
+            {
+              "name": "salary",
+              "value": "={{$node[\"Edit Fields\"].json.salary}}"
+            },
+            {
+              "name": "departmentId",
+              "value": "={{$node[\"Edit Fields\"].json.departmentId}}"
+            },
+            {
+              "name": "isActive",
+              "value": "={{$node[\"Edit Fields\"].json.isActive}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -848,
+        -320
+      ],
+      "id": "6cc9965b-bad6-4512-b471-dc5e86465825",
+      "name": "InsertEmployeeReq"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "QYJ6OHQWzDRXHr0n",
+          "mode": "list",
+          "cachedResultName": "Log",
+          "cachedResultUrl": "/projects/QftrkbIWHLn7J3Nz/datatables/QYJ6OHQWzDRXHr0n"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "employeeId": "={{$json.employeeId}}",
+            "email": "={{$json.email}}",
+            "status": "={{$json.status}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "employeeId",
+              "displayName": "employeeId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        -16
+      ],
+      "id": "caff55cb-3b68-4fc2-a7cd-c60b702bed60",
+      "name": "EmployeeAuditLog"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Email Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "EmployeeAuditLog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields Error": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields Success": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "IF_email_sent_success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Validation": {
+      "main": [
+        [
+          {
+            "node": "If_Valid_Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF_email_sent_success": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "If_Valid_Email": {
+      "main": [
+        [
+          {
+            "node": "LoginRequest",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LoginRequest": {
+      "main": [
+        [
+          {
+            "node": "InsertEmployeeReq",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "InsertEmployeeReq": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EmployeeAuditLog": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "fd84b759-8f84-424e-9819-e769d084ab12",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ea3efd18c85a4a765239e76dbf498470d1f638f0c65b119fc1e7955cef29188b"
+  },
+  "id": "zouT1cSAwmH8qhTM",
+  "tags": []
+}
